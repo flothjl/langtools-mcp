@@ -1,7 +1,8 @@
 import argparse
 import json
-import langtools_mcp.lsp.ruff_analyzer  # Register Ruff/Python analyzer on import
-from langtools_mcp.lsp.analysis import run_analysis_for_language
+
+import langtools_mcp.langtools.ruff_analyzer  # Register Ruff/Python analyzer on import
+from langtools_mcp.langtools.analysis import run_analysis_for_language
 
 
 def main():
