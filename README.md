@@ -1,13 +1,15 @@
-# langtools-mcp: Multi-Language Code Analyzer for LLMs
+# langtools-mcp: Multi-Language Code Analysis Sidecar for Agents & Automation
 
 ## Overview
 
-**langtools-mcp** provides robust, multi-language **code analysis** and static checking tools, via a modular "sidecar" daemon architecture.  
-It is designed to help Large Language Models (LLMs) or humans automatically lint, type-check, and improve code in Python—and, soon, other languages—with minimal installation friction and maximum transparency.
+**langtools-mcp** is a modular, multi-language code analysis and static-check sidecar for agents, LLMs, CI/CD, and developer automation.  
+It orchestrates best-in-class language tools (like [Ruff](https://github.com/astral-sh/ruff), gopls, rust-analyzer, and more) using a robust daemon architecture.
 
-- ⚡ **Fast**: Leverages tools like [Ruff](https://github.com/astral-sh/ruff) for blazing-fast Python analysis.
-- 🛡️ **Safe**: Daemon sidecar downloads and manages analysis tools, keeping your environment clean.
-- 🖥️ **Extensible**: Built to plug in gopls, rust-analyzer, and others in future releases.
+**Key Features:**
+- 🔗 **Unified API:** One protocol/entrypoint for diverse language toolchains and linters
+- 🔄 **Automatic Sidecar Management:** Daemon is launched and cleaned up for you
+- ⛓️ **Designed for scale:** Supports multi-lang codebases and batch processing
+- 🔜 **Future-Ready:** Easily extend with new language tools
 
 ---
 
@@ -20,102 +22,95 @@ It is designed to help Large Language Models (LLMs) or humans automatically lint
                                                                                           |
                                                                                      (runs linters)
                                                                                           v
-                                                                            ruff, gopls, etc.
+                                                                            ruff, gopls, rust-analyzer, etc.
 ```
 
-When you launch the MCP server or analyze a file, a langtools_daemon is spun up as a subprocess and managed automatically.  
-All language-analysis requests are brokered across this daemon boundary for platform safety and flexibility.
+When you launch the main server or CLI, `langtools_daemon` is started automatically and managed as a subprocess.  
+All analysis requests—regardless of the underlying language—are routed to this sidecar, which coordinates the appropriate language tools.
 
 ---
 
 ## Features
 
-- **Analyze Python files for errors, warnings, and code quality with Ruff**
-- Automatic subprocess management of the code analysis daemon
-- Fully pip/uvx-installable; no Homebrew or manual download required (for Ruff)
-- Friendly Mac and cross-platform onboarding (see Gatekeeper notes below)
+- **Multi-language support:** Python (Ruff) ready now; Go, Rust, and others coming soon
+- **Decoupled code analysis:** No need for IDEs, editors, or direct dependency on any single tool
+- **Headless & batch-friendly:** Perfect for LLMs, CI pipelines, review bots, automation
 
 ---
 
 ## Installation
 
-### 1. Clone and install dependencies
-
 ```bash
 git clone https://github.com/YOURORG/langtools-mcp.git
 cd langtools-mcp
-uv pip install -e .       # Or: uvx pip install -e .
+uv pip install -e .
 ```
 
-### 2. Confirm Ruff Is Available
+### Python/Ruff (current language supported)
 
-`ruff` is listed as a dependency and should be installed automatically—no need to install Node or npm!
+- By default, Ruff is installed as a Python dependency and used from your environment.
+- You *do not* need to install Node, gopls, or other tools unless you want analysis for non-Python languages.
 
 ---
 
 ## Quickstart
 
-### **Run MCP Analysis Server (Daemon will autostart):**
+### Run the MCP server (daemon sidecar is automatic):
 
 ```bash
 python -m langtools_mcp
 ```
 
-### **Manual Analysis of a Python File:**
-
+To process a single file:
 ```bash
-python -m langtools_mcp path/to/your_script.py
-```
-or
-```bash
-uvx run python -m langtools_mcp path/to/your_script.py
+python -m langtools_mcp path/to/your_file.py
 ```
 
 ---
 
-## Analyzing Code
+## Language Tool Installation/Usage Notes
 
-- MCP exposes an `AnalyzeFile` tool (see `src/langtools_mcp/server.py`) which, when called, routes your request through the analyzer registry and daemon, then returns results as JSON.
-- See the code in `langtools_mcp/langtools/ruff_analyzer.py` for integration example.
+- **Python (Ruff):**
+    - Will run automatically if installed as a Python dep (by pip/uv/uvx).  
+    - _**Gatekeeper on macOS:**_  
+      If you ever install Ruff manually as a native binary (not via pip), you may need to allow it in System Settings > Privacy & Security. This is generally NOT necessary for pip/uv installs.
+
+- **Go, Rust & Others:**
+    - Future tool support will guide you to install/download the right linters if not already present on PATH.
+    - Each tool’s onboarding will provide install guidance only as needed.
+
+---
+
+## How It Works
+
+- MCP exposes an `AnalyzeFile` tool and protocol (see `src/langtools_mcp/server.py`) which dispatches analysis requests through a registry to the daemon.
+- The daemon routes the request to the appropriate tool and returns normalized results as JSON.
 
 ---
 
 ## Daemon Management
 
-- The langtools_daemon is managed for you:
-    - **Startup:** MCP spawns it as a subprocess
-    - **Shutdown:** On exit or Ctrl+C, MCP ensures the daemon is cleanly stopped
-- (Advanced) To check the daemon:  
-  `ps aux | grep '[p]ython.*langtools_mcp.langtools_daemon.main'`
-
----
-
-## ⚠️ Mac Gatekeeper & ✅ Security Notes
-
-- The Ruff binary (when installed via pip/uvx from PyPI) is trusted and should "just work."
-- If you ever override the Ruff binary by downloading it yourself (not typical), you may see:
-    > "ruff" cannot be opened because Apple cannot check it for malicious software.
-- _If this happens_:  
-    Go to **System Settings → Privacy & Security** and click **Allow Anyway** for Ruff.
-- For extra safety, check the Ruff binary's checksums or install via PyPI/Homebrew.
+- Daemon startup and shutdown is fully automated—no user action needed.
+- You can check for a running daemon via:
+  ```
+  ps aux | grep '[p]ython.*langtools_mcp.langtools_daemon.main'
+  ```
 
 ---
 
 ## Troubleshooting
 
-- **Ruff not found error:**  
-  Make sure you installed with `pip install ruff` or `uvx pip install -e .`
-- **Daemon not starting:**  
-  Ensure your environment allows subprocesses and no port conflicts exist.
-- **Gatekeeper (macOS):**  
-  See "Mac Gatekeeper & Security" above.
+- **Tool not found error:**  
+  Make sure the language tool (e.g. Ruff for Python) is installed via pip/uv/uvx.
+- **macOS Gatekeeper:**  
+  Only an issue if you install a language tool manually as a system binary; not typical for default usage.
 
 ---
 
 ## Contributing
 
-PRs and feature requests welcome!  
-See `CONTRIBUTING.md` for development workflow, or open an issue with your suggestions.
+We welcome new language tool integrations, agent connectors, and usability improvements!  
+Open a PR or issue, or see `CONTRIBUTING.md` for details.
 
 ---
 
@@ -127,11 +122,12 @@ See `CONTRIBUTING.md` for development workflow, or open an issue with your sugge
 
 ## Roadmap
 
-- Add analyzers/daemons for Go (gopls), Rust (rust-analyzer), and others
-- Cross-platform binary download/bootstrapping
-- More advanced batch analysis features
+- Add Go (gopls), Rust (rust-analyzer), TypeScript, shellcheck, etc.
+- More advanced batch analysis/LLM feedback features
+- CI/CD and automation scripts
+- Ergonomic developer onboarding
 
 ---
 
-## Questions?  
+**Questions?**  
 Open an issue or discussion, or join our community chat!
