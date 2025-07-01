@@ -1,0 +1,2 @@
+mcp-dev:
+  DANGEROUSLY_OMIT_AUTH=true uv run mcp dev src/lsp_mcp/server.py
