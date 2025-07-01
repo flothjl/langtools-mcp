@@ -39,18 +39,15 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
                 return
             result = run_ruff_analysis(ruff_path, file_path)
         elif language == "go":
-            from langtools_mcp.langtools_daemon.gopls_runner import (
-                ensure_gopls,
-                run_gopls_analysis,
-            )
-
-            gopls_path, err = ensure_gopls()
-            if err is not None:
+            from langtools_mcp.langtools_daemon.lsp_adapter import GoplsLSPAdapter
+            try:
+                adapter = GoplsLSPAdapter(gopls_path="gopls")
+                result = adapter.analyze(file_path)
+            except Exception as exc:
                 self.send_response(500)
                 self.end_headers()
-                self.wfile.write(f"Unable to prepare gopls: {err}".encode())
+                self.wfile.write(f"Gopls LSP Adapter error: {exc}".encode())
                 return
-            result = run_gopls_analysis(gopls_path, file_path)
         else:
             self.send_response(400)
             self.end_headers()

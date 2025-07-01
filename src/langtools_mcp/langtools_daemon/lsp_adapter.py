@@ -4,6 +4,12 @@ import threading
 import uuid
 import os
 import time
+from abc import ABC, abstractmethod
+
+class BaseAdapter(ABC):
+    @abstractmethod
+    def analyze(self, file_path: str) -> dict:
+        pass
 
 class BasicLSPClient:
     def __init__(self, server_cmd):
@@ -76,7 +82,6 @@ class BasicLSPClient:
         self.proc.stdin.flush()
 
     def gather_notifications(self, method_filter=None, timeout=2.0):
-        # Return notifications by method, clear from queue
         t0 = time.time()
         res = []
         while time.time() - t0 < timeout:
@@ -96,7 +101,7 @@ class BasicLSPClient:
             except Exception:
                 self.proc.kill()
 
-class BasicGoplsAdapter:
+class GoplsLSPAdapter(BaseAdapter):
     def __init__(self, gopls_path="gopls"):
         self.lsp = BasicLSPClient([gopls_path, "serve", "--listen", "stdio"])
 
@@ -105,9 +110,7 @@ class BasicGoplsAdapter:
         with open(file_path) as f:
             file_content = f.read()
         root_uri = "file://" + os.path.dirname(os.path.abspath(file_path))
-        # 1. initialize
         self.lsp.send_request("initialize", {"rootUri": root_uri, "capabilities": {}, "processId": None})
-        # 2. didOpen
         self.lsp.send_notification("textDocument/didOpen", {
             "textDocument": {
                 "uri": f"file://{os.path.abspath(file_path)}",
@@ -116,7 +119,6 @@ class BasicGoplsAdapter:
                 "text": file_content
             }
         })
-        # 3. Wait for diagnostics notification
         diags = self.lsp.gather_notifications("textDocument/publishDiagnostics", timeout=2.0)
         self.lsp.shutdown()
         if not diags:
