@@ -5,7 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Josh Floth", email = "flothjldev@proton.me" }]
 requires-python = ">=3.13"
-dependencies = ["mcp[cli]>=1.8.1"]
+dependencies = [
+    "mcp[cli]>=1.8.1",
+    "ruff>=0.12.1",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=8.4.1"]
