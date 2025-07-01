@@ -6,6 +6,7 @@
 It orchestrates best-in-class language tools (like [Ruff](https://github.com/astral-sh/ruff), gopls, rust-analyzer, and more) using a robust daemon architecture.
 
 **Key Features:**
+
 - 🔗 **Unified API:** One protocol/entrypoint for diverse language toolchains and linters
 - 🔄 **Automatic Sidecar Management:** Daemon is launched and cleaned up for you
 - ⛓️ **Designed for scale:** Supports multi-lang codebases and batch processing
@@ -16,13 +17,13 @@ It orchestrates best-in-class language tools (like [Ruff](https://github.com/ast
 ## Architecture
 
 ```text
-+-------------------------------+               HTTP (localhost)               +-------------------------------+
-|     langtools-mcp (MCP)       | <-----------------------------------------> |   langtools_daemon sidecar     |
-+-------------------------------+                                               +-------------------------------+
-                                                                                          |
-                                                                                     (runs linters)
-                                                                                          v
-                                                                            ruff, gopls, rust-analyzer, etc.
++-------------------------------+      HTTP (localhost)        +-------------------------------+
+|     langtools-mcp (MCP)       | <------------------------->  |   langtools_daemon sidecar    |
++-------------------------------+                              +-------------------------------+
+                                                                              |
+                                                                          (runs linters)
+                                                                              v
+                                                                ruff, gopls, rust-analyzer, etc.
 ```
 
 When you launch the main server or CLI, `langtools_daemon` is started automatically and managed as a subprocess.  
@@ -49,35 +50,23 @@ uv pip install -e .
 ### Python/Ruff (current language supported)
 
 - By default, Ruff is installed as a Python dependency and used from your environment.
-- You *do not* need to install Node, gopls, or other tools unless you want analysis for non-Python languages.
+- You _do not_ need to install Node, gopls, or other tools unless you want analysis for non-Python languages.
 
 ---
 
 ## Quickstart
 
-### Run the MCP server (daemon sidecar is automatic):
+### Run the MCP server (daemon sidecar is automatic)
 
 ```bash
 python -m langtools_mcp
 ```
 
 To process a single file:
+
 ```bash
 python -m langtools_mcp path/to/your_file.py
 ```
-
----
-
-## Language Tool Installation/Usage Notes
-
-- **Python (Ruff):**
-    - Will run automatically if installed as a Python dep (by pip/uv/uvx).  
-    - _**Gatekeeper on macOS:**_  
-      If you ever install Ruff manually as a native binary (not via pip), you may need to allow it in System Settings > Privacy & Security. This is generally NOT necessary for pip/uv installs.
-
-- **Go, Rust & Others:**
-    - Future tool support will guide you to install/download the right linters if not already present on PATH.
-    - Each tool’s onboarding will provide install guidance only as needed.
 
 ---
 
@@ -88,29 +77,12 @@ python -m langtools_mcp path/to/your_file.py
 
 ---
 
-## Daemon Management
-
-- Daemon startup and shutdown is fully automated—no user action needed.
-- You can check for a running daemon via:
-  ```
-  ps aux | grep '[p]ython.*langtools_mcp.langtools_daemon.main'
-  ```
-
----
-
 ## Troubleshooting
 
 - **Tool not found error:**  
   Make sure the language tool (e.g. Ruff for Python) is installed via pip/uv/uvx.
 - **macOS Gatekeeper:**  
   Only an issue if you install a language tool manually as a system binary; not typical for default usage.
-
----
-
-## Contributing
-
-We welcome new language tool integrations, agent connectors, and usability improvements!  
-Open a PR or issue, or see `CONTRIBUTING.md` for details.
 
 ---
 
