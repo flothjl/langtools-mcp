@@ -22,7 +22,13 @@ class AnalyzeFileParams(BaseModel):
     file_path: FilePath
 
 
+from lsp_mcp.lsp.analysis import validate_file_type
+
 @mcp.tool("AnalyzeFile")
 def analyze_file(params: AnalyzeFileParams):
-    # TODO: implement
-    return
+    try:
+        lang = validate_file_type(str(params.file_path))
+    except ValueError as e:
+        raise McpError(str(e))
+    # Placeholder for future analysis logic
+    return {"status": "validated", "language": lang}

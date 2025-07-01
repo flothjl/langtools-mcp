@@ -1,0 +1,20 @@
+from pathlib import Path
+
+SUPPORTED_LANGUAGES = {
+    ".py": "python",
+    ".go": "go",
+}
+
+def validate_file_type(file_path: str) -> str:
+    """
+    Checks if the provided file path exists and is a supported language file.
+    Returns the detected language string (python/go).
+    Raises ValueError if not supported or if file does not exist.
+    """
+    p = Path(file_path)
+    if not p.is_file():
+        raise ValueError(f"File does not exist: {file_path!r}")
+    ext = p.suffix.lower()
+    if ext not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported file extension: {ext!r}. Only .py and .go files are supported.")
+    return SUPPORTED_LANGUAGES[ext]
