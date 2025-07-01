@@ -33,7 +33,8 @@ def validate_file_type(file_path: str) -> str:
         raise ValueError(f"Unsupported file extension: {ext!r}. Only .py and .go files are supported.")
     return SUPPORTED_LANGUAGES[ext]
 
-def run_analysis_for_language(file_path: str, language: str) -> dict:
+def run_analysis_for_language(file_path: str) -> dict:
+    language = validate_file_type(file_path)
     analyzer = ANALYZER_REGISTRY.get(language)
     if not analyzer:
         raise NotImplementedError(f"No analyzer registered for language: {language!r}")

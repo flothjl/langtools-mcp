@@ -53,7 +53,7 @@ def test_run_analysis_for_language_success():
         tf.write(b'# test')
         tf.flush()
         try:
-            result = run_analysis_for_language(tf.name, "python")
+            result = run_analysis_for_language(tf.name)
             assert result["result"].startswith("dummy analysis")
         finally:
             os.remove(tf.name)
@@ -67,7 +67,7 @@ def test_run_analysis_unregistered_language_raises():
         tf.flush()
         try:
             with pytest.raises(NotImplementedError, match=r'No analyzer registered for language'):
-                run_analysis_for_language(tf.name, "go")
+                run_analysis_for_language(tf.name)
         finally:
             os.remove(tf.name)
     ANALYZER_REGISTRY.clear()
