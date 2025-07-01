@@ -14,15 +14,16 @@ It is designed to help Large Language Models (LLMs) or humans automatically lint
 ## Architecture
 
 ```text
-+---------------------+      HTTP (localhost)       +----------------------------+
-|   langtools-mcp (MCP)     |<-------------------------->|     LSP Daemon Sidecar      |
-+---------------------+                             +----------------------------+
-                                                       |   (runs linters/checkers)
-                                                       v
-                                                   ruff, gopls, ...
++-------------------------------+               HTTP (localhost)               +-------------------------------+
+|     langtools-mcp (MCP)       | <-----------------------------------------> |   langtools_daemon sidecar     |
++-------------------------------+                                               +-------------------------------+
+                                                                                          |
+                                                                                     (runs linters)
+                                                                                          v
+                                                                            ruff, gopls, etc.
 ```
 
-When you launch the MCP server or analyze a file, an LSP daemon is spun up as a subprocess and managed automatically.  
+When you launch the MCP server or analyze a file, a langtools_daemon is spun up as a subprocess and managed automatically.  
 All language-analysis requests are brokered across this daemon boundary for platform safety and flexibility.
 
 ---
@@ -75,17 +76,17 @@ uvx run python -m langtools_mcp path/to/your_script.py
 ## Analyzing Code
 
 - MCP exposes an `AnalyzeFile` tool (see `src/langtools_mcp/server.py`) which, when called, routes your request through the analyzer registry and daemon, then returns results as JSON.
-- See the code in `langtools_mcp/lsp/ruff_analyzer.py` for integration example.
+- See the code in `langtools_mcp/langtools/ruff_analyzer.py` for integration example.
 
 ---
 
 ## Daemon Management
 
-- The LSP daemon is managed for you:
+- The langtools_daemon is managed for you:
     - **Startup:** MCP spawns it as a subprocess
     - **Shutdown:** On exit or Ctrl+C, MCP ensures the daemon is cleanly stopped
 - (Advanced) To check the daemon:  
-  `ps aux | grep '[p]ython.*langtools_mcp.lsp_daemon.main'`
+  `ps aux | grep '[p]ython.*langtools_mcp.langtools_daemon.main'`
 
 ---
 
@@ -128,7 +129,7 @@ See `CONTRIBUTING.md` for development workflow, or open an issue with your sugge
 
 - Add analyzers/daemons for Go (gopls), Rust (rust-analyzer), and others
 - Cross-platform binary download/bootstrapping
-- More advanced LSP-mode analysis features
+- More advanced batch analysis features
 
 ---
 
