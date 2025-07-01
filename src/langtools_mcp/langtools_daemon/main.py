@@ -38,6 +38,15 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
                 self.wfile.write(f"Unable to prepare ruff: {err}".encode())
                 return
             result = run_ruff_analysis(ruff_path, file_path)
+        elif language == "go":
+            from langtools_mcp.langtools_daemon.gopls_runner import ensure_gopls, run_gopls_analysis
+            gopls_path, err = ensure_gopls()
+            if err is not None:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(f"Unable to prepare gopls: {err}".encode())
+                return
+            result = run_gopls_analysis(gopls_path, file_path)
         else:
             self.send_response(400)
             self.end_headers()
