@@ -1,8 +1,8 @@
-# lsp-mcp: Multi-Language Code Analyzer for LLMs
+# langtools-mcp: Multi-Language Code Analyzer for LLMs
 
 ## Overview
 
-**lsp-mcp** provides robust, multi-language **code analysis** and static checking tools, via a modular "sidecar" daemon architecture.  
+**langtools-mcp** provides robust, multi-language **code analysis** and static checking tools, via a modular "sidecar" daemon architecture.  
 It is designed to help Large Language Models (LLMs) or humans automatically lint, type-check, and improve code in Python—and, soon, other languages—with minimal installation friction and maximum transparency.
 
 - ⚡ **Fast**: Leverages tools like [Ruff](https://github.com/astral-sh/ruff) for blazing-fast Python analysis.
@@ -15,7 +15,7 @@ It is designed to help Large Language Models (LLMs) or humans automatically lint
 
 ```text
 +---------------------+      HTTP (localhost)       +----------------------------+
-|   lsp-mcp (MCP)     |<-------------------------->|     LSP Daemon Sidecar      |
+|   langtools-mcp (MCP)     |<-------------------------->|     LSP Daemon Sidecar      |
 +---------------------+                             +----------------------------+
                                                        |   (runs linters/checkers)
                                                        v
@@ -41,8 +41,8 @@ All language-analysis requests are brokered across this daemon boundary for plat
 ### 1. Clone and install dependencies
 
 ```bash
-git clone https://github.com/YOURORG/lsp-mcp.git
-cd lsp-mcp
+git clone https://github.com/YOURORG/langtools-mcp.git
+cd langtools-mcp
 uv pip install -e .       # Or: uvx pip install -e .
 ```
 
@@ -57,25 +57,25 @@ uv pip install -e .       # Or: uvx pip install -e .
 ### **Run MCP Analysis Server (Daemon will autostart):**
 
 ```bash
-python -m lsp_mcp
+python -m langtools_mcp
 ```
 
 ### **Manual Analysis of a Python File:**
 
 ```bash
-python -m lsp_mcp path/to/your_script.py
+python -m langtools_mcp path/to/your_script.py
 ```
 or
 ```bash
-uvx run python -m lsp_mcp path/to/your_script.py
+uvx run python -m langtools_mcp path/to/your_script.py
 ```
 
 ---
 
 ## Analyzing Code
 
-- MCP exposes an `AnalyzeFile` tool (see `src/lsp_mcp/server.py`) which, when called, routes your request through the analyzer registry and daemon, then returns results as JSON.
-- See the code in `lsp_mcp/lsp/ruff_analyzer.py` for integration example.
+- MCP exposes an `AnalyzeFile` tool (see `src/langtools_mcp/server.py`) which, when called, routes your request through the analyzer registry and daemon, then returns results as JSON.
+- See the code in `langtools_mcp/lsp/ruff_analyzer.py` for integration example.
 
 ---
 
@@ -85,7 +85,7 @@ uvx run python -m lsp_mcp path/to/your_script.py
     - **Startup:** MCP spawns it as a subprocess
     - **Shutdown:** On exit or Ctrl+C, MCP ensures the daemon is cleanly stopped
 - (Advanced) To check the daemon:  
-  `ps aux | grep '[p]ython.*lsp_mcp.lsp_daemon.main'`
+  `ps aux | grep '[p]ython.*langtools_mcp.lsp_daemon.main'`
 
 ---
 

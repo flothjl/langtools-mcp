@@ -3,7 +3,7 @@ import sys
 import json
 import shutil
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from lsp_mcp.lsp_daemon.ruff_runner import ensure_ruff, run_ruff_analysis
+from langtools_mcp.lsp_daemon.ruff_runner import ensure_ruff, run_ruff_analysis
 
 HOST = "localhost"
 PORT = 61782

@@ -6,11 +6,11 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from lsp_mcp.lsp_daemon import ruff_runner
+from langtools_mcp.lsp_daemon import ruff_runner
 
 # Unit test the downloader to ensure it would download, extract, and chmod
-@patch("lsp_mcp.lsp_daemon.ruff_runner.urllib.request.urlretrieve")
-@patch("lsp_mcp.lsp_daemon.ruff_runner.tarfile.open")
+@patch("langtools_mcp.lsp_daemon.ruff_runner.urllib.request.urlretrieve")
+@patch("langtools_mcp.lsp_daemon.ruff_runner.tarfile.open")
 def test_ensure_ruff_download_extract(mock_taropen, mock_urlretrieve, tmp_path):
     # Remove binary if exists
     ruff_bin = ruff_runner.RUFF_BIN
@@ -31,7 +31,7 @@ def test_ensure_ruff_download_extract(mock_taropen, mock_urlretrieve, tmp_path):
     assert err is None
     assert os.access(bin_path, os.X_OK)
 
-@patch("lsp_mcp.lsp_daemon.ruff_runner.subprocess.run")
+@patch("langtools_mcp.lsp_daemon.ruff_runner.subprocess.run")
 def test_run_ruff_analysis_ok(mock_run, tmp_path):
     tf = tmp_path / "sample.py"
     tf.write_text("import os\n")
@@ -47,7 +47,7 @@ def test_run_ruff_analysis_ok(mock_run, tmp_path):
     output = json.loads(result["output"])
     assert output[0]["code"] == "F401"
 
-@patch("lsp_mcp.lsp_daemon.ruff_runner.subprocess.run")
+@patch("langtools_mcp.lsp_daemon.ruff_runner.subprocess.run")
 def test_run_ruff_analysis_fail(mock_run, tmp_path):
     tf = tmp_path / "sample.py"
     tf.write_text("import fail\n")

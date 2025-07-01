@@ -8,7 +8,7 @@ from .server import mcp
 
 def start_lsp_daemon():
     proc = subprocess.Popen(
-        [sys.executable, "-u", "-m", "lsp_mcp.lsp_daemon.main"],
+        [sys.executable, "-u", "-m", "langtools_mcp.lsp_daemon.main"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )

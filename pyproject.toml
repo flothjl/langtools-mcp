@@ -1,5 +1,5 @@
 [project]
-name = "lsp-mcp"
+name = "langtools-mcp"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -14,7 +14,7 @@ dependencies = [
 test = ["pytest>=8.4.1"]
 
 [project.scripts]
-lsp-mcp = "lsp_mcp:main"
+langtools-mcp = "langtools_mcp:main"
 
 [tool.pytest.ini_options]
 python_files = ["test_*.py", "*_test.py"]

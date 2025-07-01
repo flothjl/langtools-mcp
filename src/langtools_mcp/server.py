@@ -11,8 +11,8 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INVALID_REQUEST, ErrorData
 from pydantic import BaseModel, FilePath
 
-import lsp_mcp.lsp.ruff_analyzer  # ensures RuffAnalyzer is registered
-from lsp_mcp.lsp.analysis import run_analysis_for_language
+import langtools_mcp.lsp.ruff_analyzer  # ensures RuffAnalyzer is registered
+from langtools_mcp.lsp.analysis import run_analysis_for_language
 
 INSTRUCTIONS = """
 Currently ONLY supports python

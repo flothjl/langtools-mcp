@@ -2,7 +2,7 @@ import os
 import tempfile
 import pytest
 
-from lsp_mcp.lsp.analysis import (
+from langtools_mcp.lsp.analysis import (
     validate_file_type, run_analysis_for_language,
     BaseAnalyzer, register_analyzer, ANALYZER_REGISTRY
 )

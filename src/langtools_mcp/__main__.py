@@ -1,7 +1,7 @@
 import argparse
 import json
 
-from lsp_mcp.lsp.analysis import run_analysis_for_language
+from langtools_mcp.lsp.analysis import run_analysis_for_language
 
 
 def main():
