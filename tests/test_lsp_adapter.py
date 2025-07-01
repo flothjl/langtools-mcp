@@ -3,6 +3,8 @@ from unittest.mock import MagicMock, patch
 from langtools_mcp.langtools_daemon.lsp_adapter import BasicLSPClient, BasicGoplsAdapter
 import io
 import json
+import threading
+import time
 
 class DummyPopen:
     def __init__(self, stdout_lines=None):
@@ -53,10 +55,37 @@ def test_send_request_response(mock_uuid4, mock_popen):
         "result": {"foo": "bar"}
     }
     payload = json.dumps(response).encode("utf-8")
-    lines = [f"Content-Length: {len(payload)}\r\n".encode("utf-8"),
-             b"\r\n",
-             payload]
-    mock_proc = DummyPopen(stdout_lines=lines)
+    header = f"Content-Length: {len(payload)}\r\n".encode("utf-8")
+    blank = b"\r\n"
+    # --- Mock process setup to coordinate thread-wise ---
+    class LiveDummyProc:
+        def __init__(self):
+            self.stdin = io.BytesIO()
+            self.stdout = self
+            self.stderr = io.BytesIO()
+            self._lock = threading.Lock()
+            self.readline_calls = 0
+            self.terminated = False
+        def readline(self):
+            # Synchronize: first and second calls deliver header and blank
+            with self._lock:
+                if self.readline_calls == 0:
+                    self.readline_calls += 1
+                    return header
+                elif self.readline_calls == 1:
+                    self.readline_calls += 1
+                    return blank
+                else:
+                    time.sleep(0.05)
+                    return b''
+        def read(self, n):
+            return payload
+        def write(self, b): return len(b)
+        def flush(self): return None
+        def terminate(self): self.terminated = True
+        def wait(self, timeout=None): return 0
+        def kill(self): self.terminated = True
+    mock_proc = LiveDummyProc()
     mock_popen.return_value = mock_proc
     client = BasicLSPClient(["/bin/foo"])
     client.start()
