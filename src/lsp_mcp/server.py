@@ -11,7 +11,8 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INVALID_REQUEST, ErrorData
 from pydantic import BaseModel, FilePath
 
-from lsp_mcp.lsp.analysis import validate_file_type
+from lsp_mcp.lsp.analysis import run_analysis_for_language
+import lsp_mcp.lsp.ruff_analyzer  # ensures RuffAnalyzer is registered
 
 INSTRUCTIONS = """
 
@@ -19,10 +20,8 @@ INSTRUCTIONS = """
 
 mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)
 
-
 class AnalyzeFileParams(BaseModel):
     file_path: FilePath
-
 
 @mcp.tool("AnalyzeFile")
 def analyze_file(params: AnalyzeFileParams):
