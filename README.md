@@ -5,6 +5,10 @@
 **lsp-mcp** provides robust, multi-language **code analysis** and static checking tools, via a modular "sidecar" daemon architecture.  
 It is designed to help Large Language Models (LLMs) or humans automatically lint, type-check, and improve code in Python—and, soon, other languages—with minimal installation friction and maximum transparency.
 
+<a href="https://glama.ai/mcp/servers/@flothjl/lsp-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@flothjl/lsp-mcp/badge" alt="lsp-mcp MCP server" />
+</a>
+
 - ⚡ **Fast**: Leverages tools like [Ruff](https://github.com/astral-sh/ruff) for blazing-fast Python analysis.
 - 🛡️ **Safe**: Daemon sidecar downloads and manages analysis tools, keeping your environment clean.
 - 🖥️ **Extensible**: Built to plug in gopls, rust-analyzer, and others in future releases.
