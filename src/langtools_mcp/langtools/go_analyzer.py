@@ -1,5 +1,5 @@
 from .analysis import BaseAnalyzer, register_analyzer
-from .lsp_daemon_client import LSPDaemonClient
+from .langtools_daemon_client import LSPDaemonClient
 
 class GoAnalyzer(BaseAnalyzer):
     def analyze(self, file_path: str) -> dict:

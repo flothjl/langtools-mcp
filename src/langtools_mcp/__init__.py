@@ -6,7 +6,7 @@ import sys
 from .server import mcp
 
 
-def start_lsp_daemon():
+def start_langtools_daemon():
     proc = subprocess.Popen(
         [sys.executable, "-u", "-m", "langtools_mcp.langtools_daemon.main"],
         stdout=subprocess.PIPE,
@@ -14,7 +14,7 @@ def start_lsp_daemon():
     )
 
     def cleanup():
-        print("Shutting down LSP daemon...")
+        print("Shutting down langtools_daemon...")
         proc.terminate()
         try:
             proc.wait(timeout=5)
@@ -31,10 +31,9 @@ def start_lsp_daemon():
     signal.signal(signal.SIGINT, sig_handler)
     return proc
 
-
 def main():
-    print("Starting LSP daemon sidecar...")
-    _daemon_proc = start_lsp_daemon()
+    print("Starting langtools_daemon sidecar...")
+    _daemon_proc = start_langtools_daemon()
     mcp.run()
 
 
