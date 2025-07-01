@@ -42,7 +42,7 @@ All analysis requests—regardless of the underlying language—are routed to th
 ## Installation
 
 ```bash
-git clone https://github.com/YOURORG/langtools-mcp.git
+git clone https://github.com/flothjl/langtools-mcp.git
 cd langtools-mcp
 uv sync
 ```
