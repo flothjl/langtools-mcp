@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from langtools_mcp.langtools_daemon import ruff_runner
+
 
 @patch("subprocess.run")
 def test_run_ruff_analysis_ok(mock_run, tmp_path):
@@ -15,6 +16,7 @@ def test_run_ruff_analysis_ok(mock_run, tmp_path):
     assert result["status"] == "ok"
     output = result["output"]
     assert "F401" in output
+
 
 @patch("subprocess.run")
 def test_run_ruff_analysis_fail(mock_run, tmp_path):

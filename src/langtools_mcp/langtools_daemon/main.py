@@ -1,10 +1,5 @@
 import json
-import os
-import shutil
-import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
-from langtools_mcp.langtools_daemon.ruff_runner import ensure_ruff, run_ruff_analysis
 
 HOST = "localhost"
 PORT = 61782
@@ -31,6 +26,11 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
             return
         result = None
         if language == "python":
+            from langtools_mcp.langtools_daemon.ruff_runner import (
+                ensure_ruff,
+                run_ruff_analysis,
+            )
+
             ruff_path, err = ensure_ruff()
             if err is not None:
                 self.send_response(500)
@@ -39,7 +39,11 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
                 return
             result = run_ruff_analysis(ruff_path, file_path)
         elif language == "go":
-            from langtools_mcp.langtools_daemon.gopls_runner import ensure_gopls, run_gopls_analysis
+            from langtools_mcp.langtools_daemon.gopls_runner import (
+                ensure_gopls,
+                run_gopls_analysis,
+            )
+
             gopls_path, err = ensure_gopls()
             if err is not None:
                 self.send_response(500)

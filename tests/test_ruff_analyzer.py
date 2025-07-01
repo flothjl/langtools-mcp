@@ -1,6 +1,5 @@
 import json
 import tempfile
-from unittest.mock import MagicMock, patch
 
 from langtools_mcp.langtools.ruff_analyzer import RuffAnalyzer
 

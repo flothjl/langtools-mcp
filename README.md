@@ -8,7 +8,6 @@ It orchestrates best-in-class language tools (like [Ruff](https://github.com/ast
 **Key Features:**
 
 - 🔗 **Unified API:** One protocol/entrypoint for diverse language toolchains and linters
-- 🔄 **Automatic Sidecar Management:** Daemon is launched and cleaned up for you
 - ⛓️ **Designed for scale:** Supports multi-lang codebases and batch processing
 - 🔜 **Future-Ready:** Easily extend with new language tools
 
