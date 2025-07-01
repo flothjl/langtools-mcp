@@ -44,23 +44,12 @@ All analysis requests—regardless of the underlying language—are routed to th
 ```bash
 git clone https://github.com/YOURORG/langtools-mcp.git
 cd langtools-mcp
-uv pip install -e .
+uv sync
 ```
-
-### Python/Ruff (current language supported)
-
-- By default, Ruff is installed as a Python dependency and used from your environment.
-- You _do not_ need to install Node, gopls, or other tools unless you want analysis for non-Python languages.
 
 ---
 
 ## Quickstart
-
-### Run the MCP server (daemon sidecar is automatic)
-
-```bash
-python -m langtools_mcp
-```
 
 To process a single file:
 
@@ -94,10 +83,8 @@ python -m langtools_mcp path/to/your_file.py
 
 ## Roadmap
 
-- Add Go (gopls), Rust (rust-analyzer), TypeScript, shellcheck, etc.
+- Add Go (gopls), Rust (rust-analyzer), TypeScript, etc.
 - More advanced batch analysis/LLM feedback features
-- CI/CD and automation scripts
-- Ergonomic developer onboarding
 
 ---
 
