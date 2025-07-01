@@ -11,6 +11,8 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INVALID_REQUEST, ErrorData
 from pydantic import BaseModel, FilePath
 
+from lsp_mcp.lsp.analysis import validate_file_type
+
 INSTRUCTIONS = """
 
 """
@@ -22,13 +24,16 @@ class AnalyzeFileParams(BaseModel):
     file_path: FilePath
 
 
-from lsp_mcp.lsp.analysis import validate_file_type
-
 @mcp.tool("AnalyzeFile")
 def analyze_file(params: AnalyzeFileParams):
     try:
         lang = validate_file_type(str(params.file_path))
     except ValueError as e:
-        raise McpError(str(e))
-    # Placeholder for future analysis logic
-    return {"status": "validated", "language": lang}
+        raise McpError(ErrorData(message=str(e), code=INVALID_REQUEST))
+    # Dispatch to the registered analyzer for this language
+    from lsp_mcp.lsp.analysis import run_analysis_for_language
+    try:
+        analysis_result = run_analysis_for_language(str(params.file_path), lang)
+    except NotImplementedError as e:
+        raise McpError(ErrorData(message=str(e), code=INVALID_REQUEST))
+    return analysis_result
