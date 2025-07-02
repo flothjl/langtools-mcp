@@ -7,12 +7,23 @@ import time
 import uuid
 from abc import ABC, abstractmethod
 
+def find_go_module_root(file_path):
+    dir_path = os.path.abspath(os.path.dirname(file_path))
+    while True:
+        maybe_mod = os.path.join(dir_path, "go.mod")
+        if os.path.isfile(maybe_mod):
+            return dir_path
+        parent = os.path.dirname(dir_path)
+        if parent == dir_path:
+            break
+        dir_path = parent
+    # Fallback: file's parent
+    return os.path.abspath(os.path.dirname(file_path))
 
 class BaseAdapter(ABC):
     @abstractmethod
     def analyze(self, file_path: str) -> dict:
         pass
-
 
 class BasicLSPClient:
     def __init__(self, server_cmd):
@@ -95,7 +106,6 @@ class BasicLSPClient:
             except Exception:
                 self.proc.kill()
 
-
 class GoplsLSPAdapter(BaseAdapter):
     def __init__(self, gopls_path="gopls"):
         self.lsp = BasicLSPClient([gopls_path])
@@ -107,7 +117,9 @@ class GoplsLSPAdapter(BaseAdapter):
             with open(file_path) as f:
                 file_content = f.read()
             print("[GOPLS ADAPTER] Opened file", file=sys.stderr)
-            root_uri = "file://" + os.path.dirname(os.path.abspath(file_path))
+            mod_root = find_go_module_root(file_path)
+            root_uri = "file://" + mod_root
+            print(f"[GOPLS ADAPTER] Using root_uri={root_uri}", file=sys.stderr)
             init_resp = self.lsp.send_request(
                 "initialize",
                 {"rootUri": root_uri, "capabilities": {}, "processId": None},
