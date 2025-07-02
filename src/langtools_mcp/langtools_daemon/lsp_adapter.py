@@ -7,6 +7,7 @@ import time
 import uuid
 from abc import ABC, abstractmethod
 
+
 def find_go_module_root(file_path):
     dir_path = os.path.abspath(os.path.dirname(file_path))
     while True:
@@ -20,10 +21,12 @@ def find_go_module_root(file_path):
     # Fallback: file's parent
     return os.path.abspath(os.path.dirname(file_path))
 
+
 class BaseAdapter(ABC):
     @abstractmethod
     def analyze(self, file_path: str) -> dict:
         pass
+
 
 class BasicLSPClient:
     def __init__(self, server_cmd):
@@ -106,6 +109,7 @@ class BasicLSPClient:
             except Exception:
                 self.proc.kill()
 
+
 class GoplsLSPAdapter(BaseAdapter):
     def __init__(self, gopls_path="gopls"):
         self.lsp = BasicLSPClient([gopls_path])
@@ -125,6 +129,8 @@ class GoplsLSPAdapter(BaseAdapter):
                 {"rootUri": root_uri, "capabilities": {}, "processId": None},
             )
             print(f"[GOPLS ADAPTER] initialize resp: {init_resp}", file=sys.stderr)
+            self.lsp.send_notification("initialized", {})
+            time.sleep(0.5)
             self.lsp.send_notification(
                 "textDocument/didOpen",
                 {
