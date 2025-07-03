@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 
 
 def ensure_gopls():
@@ -10,8 +11,6 @@ def ensure_gopls():
 
 
 def run_gopls_analysis(gopls_bin, file_path):
-    import subprocess
-
     try:
         cmd = [gopls_bin, "check", file_path]
         proc = subprocess.run(

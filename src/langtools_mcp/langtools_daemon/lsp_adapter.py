@@ -54,6 +54,8 @@ class BasicLSPClient:
     def _reader(self):
         while self._running:
             try:
+                if not self.proc or not self.proc.stdout:
+                    raise
                 length_line = self.proc.stdout.readline()
                 if not length_line:
                     break
@@ -108,54 +110,3 @@ class BasicLSPClient:
                 self.proc.wait(timeout=3)
             except Exception:
                 self.proc.kill()
-
-
-class GoplsLSPAdapter(BaseAdapter):
-    def __init__(self, gopls_path="gopls"):
-        self.lsp = BasicLSPClient([gopls_path])
-
-    def analyze(self, file_path):
-        try:
-            print("[GOPLS ADAPTER] Starting analyze", file=sys.stderr)
-            self.lsp.start()
-            with open(file_path) as f:
-                file_content = f.read()
-            print("[GOPLS ADAPTER] Opened file", file=sys.stderr)
-            mod_root = find_go_module_root(file_path)
-            root_uri = "file://" + mod_root
-            print(f"[GOPLS ADAPTER] Using root_uri={root_uri}", file=sys.stderr)
-            init_resp = self.lsp.send_request(
-                "initialize",
-                {"rootUri": root_uri, "capabilities": {}, "processId": None},
-            )
-            print(f"[GOPLS ADAPTER] initialize resp: {init_resp}", file=sys.stderr)
-            self.lsp.send_notification("initialized", {})
-            time.sleep(0.5)
-            self.lsp.send_notification(
-                "textDocument/didOpen",
-                {
-                    "textDocument": {
-                        "uri": f"file://{os.path.abspath(file_path)}",
-                        "languageId": "go",
-                        "version": 1,
-                        "text": file_content,
-                    }
-                },
-            )
-            print("[GOPLS ADAPTER] Sent didOpen notification", file=sys.stderr)
-            diags = self.lsp.gather_notifications(
-                "textDocument/publishDiagnostics", timeout=5.0
-            )
-            print(f"[GOPLS ADAPTER] diags: {diags}", file=sys.stderr)
-            self.lsp.shutdown()
-            if diags:
-                return {"status": "ok", "diagnostics": diags}
-            else:
-                print("[GOPLS ADAPTER] No diagnostics received.", file=sys.stderr)
-                return {"status": "ok", "note": "No diagnostics received from gopls."}
-        except Exception as e:
-            print(f"[GOPLS ADAPTER EXCEPTION] {e}", file=sys.stderr)
-            import traceback
-
-            traceback.print_exc(file=sys.stderr)
-            return {"status": "fail", "error": f"Exception in analyzer: {e}"}

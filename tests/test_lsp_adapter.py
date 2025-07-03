@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from langtools_mcp.langtools_daemon.lsp_adapter import BasicLSPClient, GoplsLSPAdapter
+from langtools_mcp.langtools_daemon.lsp_adapter import BasicLSPClient
+from langtools_mcp.langtools_daemon.gopls_lsp_adapter import GoplsLSPAdapter
 import io
 import json
 import threading
@@ -105,7 +106,7 @@ def test_gopls_adapter_batch_diag(mock_uuid4, mock_popen, tmp_path):
     mock_proc = DummyPopen(stdout_lines=lines)
     mock_popen.return_value = mock_proc
     mock_uuid4.return_value = "test-id"
-    adapter = GoplsLSPAdapter(gopls_path="gopls")
+    adapter = GoplsLSPAdapter(root_path=str(tmp_path), gopls_path="gopls")
     result = adapter.analyze(str(file_path))
     assert result["status"] == "ok"
     if "diagnostics" in result:
