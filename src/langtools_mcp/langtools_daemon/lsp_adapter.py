@@ -5,7 +5,6 @@ import sys
 import threading
 import time
 import uuid
-from abc import ABC, abstractmethod
 
 
 def find_go_module_root(file_path):
@@ -20,12 +19,6 @@ def find_go_module_root(file_path):
         dir_path = parent
     # Fallback: file's parent
     return os.path.abspath(os.path.dirname(file_path))
-
-
-class BaseAdapter(ABC):
-    @abstractmethod
-    def analyze(self, file_path: str) -> dict:
-        pass
 
 
 class BasicLSPClient:
@@ -78,10 +71,10 @@ class BasicLSPClient:
         header = f"Content-Length: {len(raw)}\r\n\r\n".encode("utf-8")
         self.proc.stdin.write(header + raw)
         self.proc.stdin.flush()
-        for _ in range(100):
+        for _ in range(1000):
             if msg_id in self.responses:
                 return self.responses.pop(msg_id)
-            time.sleep(0.1)
+            time.sleep(0.01)
         return None
 
     def send_notification(self, method, params):
@@ -95,7 +88,7 @@ class BasicLSPClient:
         t0 = time.time()
         res = []
         while time.time() - t0 < timeout:
-            time.sleep(0.1)
+            time.sleep(0.01)
             for msg in self.notifications[:]:
                 if not method_filter or msg.get("method") == method_filter:
                     res.append(msg)
