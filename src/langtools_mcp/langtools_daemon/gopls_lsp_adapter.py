@@ -50,7 +50,7 @@ class GoplsLSPAdapter:
             )
             print("[GOPLS ADAPTER] Sent didOpen notification", file=sys.stderr)
             diags = self.lsp.gather_notifications(
-                "textDocument/publishDiagnostics", timeout=5.0
+                "textDocument/publishDiagnostics", timeout=10.0
             )
             print(f"[GOPLS ADAPTER] diags: {diags}", file=sys.stderr)
             # Optionally send didClose to minimize memory in big servers

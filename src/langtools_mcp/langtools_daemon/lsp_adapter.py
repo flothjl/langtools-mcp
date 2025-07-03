@@ -27,7 +27,9 @@ class BasicLSPClient:
         self.proc = None
         self.reader_thread = None
         self.responses = {}
+        self.response_events = {}  # id -> threading.Event
         self.notifications = []
+        self.notifications_event = threading.Event()
         self._buffer = b""
         self._running = False
 
@@ -47,8 +49,6 @@ class BasicLSPClient:
     def _reader(self):
         while self._running:
             try:
-                if not self.proc or not self.proc.stdout:
-                    raise
                 length_line = self.proc.stdout.readline()
                 if not length_line:
                     break
@@ -59,23 +59,31 @@ class BasicLSPClient:
                     msg = json.loads(payload.decode("utf-8"))
                     if "id" in msg:
                         self.responses[msg["id"]] = msg
+                        if msg["id"] in self.response_events:
+                            self.response_events[msg["id"]].set()
                     elif "method" in msg:
                         self.notifications.append(msg)
+                        self.notifications_event.set()
             except Exception:
                 break
 
-    def send_request(self, method, params):
+    def send_request(self, method, params, timeout=5.0):
         msg_id = str(uuid.uuid4())
+        evt = threading.Event()
+        self.response_events[msg_id] = evt
         msg = {"jsonrpc": "2.0", "id": msg_id, "method": method, "params": params}
         raw = json.dumps(msg).encode("utf-8")
         header = f"Content-Length: {len(raw)}\r\n\r\n".encode("utf-8")
         self.proc.stdin.write(header + raw)
         self.proc.stdin.flush()
-        for _ in range(1000):
-            if msg_id in self.responses:
-                return self.responses.pop(msg_id)
-            time.sleep(0.01)
-        return None
+        # Block until event is set or timeout
+        if evt.wait(timeout):
+            ret = self.responses.pop(msg_id, None)
+            self.response_events.pop(msg_id, None)
+            return ret
+        else:
+            self.response_events.pop(msg_id, None)
+            return None
 
     def send_notification(self, method, params):
         msg = {"jsonrpc": "2.0", "method": method, "params": params}
@@ -84,16 +92,33 @@ class BasicLSPClient:
         self.proc.stdin.write(header + raw)
         self.proc.stdin.flush()
 
-    def gather_notifications(self, method_filter=None, timeout=2.0):
-        t0 = time.time()
-        res = []
-        while time.time() - t0 < timeout:
-            time.sleep(0.01)
+    def gather_notifications(self, method_filter=None, timeout=10.0):
+        self.notifications_event.clear()
+        result = []
+        start = time.time()
+        got_empty_diag = False
+        while time.time() - start < timeout:
             for msg in self.notifications[:]:
                 if not method_filter or msg.get("method") == method_filter:
-                    res.append(msg)
+                    result.append(msg)
                     self.notifications.remove(msg)
-        return res
+            if result:
+                if method_filter == "textDocument/publishDiagnostics":
+                    # Return as soon as we see non-empty diagnostics
+                    for r in result:
+                        params = r.get("params", {})
+                        if "diagnostics" in params and params["diagnostics"]:
+                            return [r]
+                    # Only empty diagnostics so far—wait for a bit longer for LSP server to catch up
+                    got_empty_diag = True
+                    time.sleep(0.1)
+                else:
+                    return result
+            # Wait for new pub/sub notifications
+            self.notifications_event.wait(timeout=timeout - (time.time() - start))
+            if got_empty_diag and (time.time() - start) > (timeout - 0.5):
+                break  # If we waited most of the timeout after empty, just return
+        return result
 
     def shutdown(self):
         self._running = False
