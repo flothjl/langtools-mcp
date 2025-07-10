@@ -48,10 +48,10 @@ class GoplsLSPAdapter:
             "staticcheck": True,
             "directoryFilters": [
                 "-.git",
-                "-.vscode", 
+                "-.vscode",
                 "-.idea",
                 "-.vscode-test",
-                "-node_modules"
+                "-node_modules",
             ],
             "semanticTokens": True,
         }
@@ -65,7 +65,7 @@ class GoplsLSPAdapter:
             self.lsp = BasicLSPClient([self.gopls_path])
             self.lsp.start()
             root_uri = "file://" + self.root_path
-            
+
             # Enhanced initialization with gopls configuration
             init_params = {
                 "rootUri": root_uri,
@@ -80,30 +80,24 @@ class GoplsLSPAdapter:
                     }
                 },
                 "processId": None,
-                "initializationOptions": {
-                    "settings": {
-                        "gopls": self.config
-                    }
-                }
+                "initializationOptions": self.config,
             }
-            
+
             init_resp = self.lsp.send_request("initialize", init_params)
             print(f"[GOPLS ADAPTER] initialize resp: {init_resp}", file=sys.stderr)
-            
+
             # Send initialized notification
             self.lsp.send_notification("initialized", {})
-            
+
             # Send workspace configuration (alternative/additional method)
             self.lsp.send_notification(
-                "workspace/didChangeConfiguration",
-                {
-                    "settings": {
-                        "gopls": self.config
-                    }
-                }
+                "workspace/didChangeConfiguration", {"settings": {"gopls": self.config}}
             )
-            
-            print(f"[GOPLS ADAPTER] Sent gopls configuration: {self.config}", file=sys.stderr)
+
+            print(
+                f"[GOPLS ADAPTER] Sent gopls configuration: {self.config}",
+                file=sys.stderr,
+            )
             time.sleep(0.5)
             self.started = True
 
