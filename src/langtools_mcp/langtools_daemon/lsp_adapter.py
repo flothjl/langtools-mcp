@@ -93,31 +93,67 @@ class BasicLSPClient:
         self.proc.stdin.flush()
 
     def gather_notifications(self, method_filter=None, timeout=10.0):
+        """
+        Gather notifications from the LSP server.
+
+        For diagnostics, this method collects ALL diagnostic messages.
+        This is important because LSP servers
+        like gopls often send multiple publishDiagnostics messages:
+        - One for compilation errors
+        - One for linting issues
+        - One for code analysis warnings
+        - Separate messages for different files/packages
+
+        The method uses a "settle" strategy: after receiving the first diagnostic
+        message, it waits for a brief period (500ms) to collect additional messages
+        before returning all collected diagnostics.
+        """
         self.notifications_event.clear()
         result = []
         start = time.time()
-        got_empty_diag = False
+        last_diagnostic_time = None
+        diagnostic_settle_time = 0.5  # Wait 500ms after last diagnostic message
+
         while time.time() - start < timeout:
+            initial_count = len(result)
+
+            # Collect all available notifications matching the filter
             for msg in self.notifications[:]:
                 if not method_filter or msg.get("method") == method_filter:
                     result.append(msg)
                     self.notifications.remove(msg)
-            if result:
-                if method_filter == "textDocument/publishDiagnostics":
-                    # Return as soon as we see non-empty diagnostics
-                    for r in result:
-                        params = r.get("params", {})
+
+                    # Track timing for diagnostic messages
+                    if method_filter == "textDocument/publishDiagnostics":
+                        params = msg.get("params", {})
                         if "diagnostics" in params and params["diagnostics"]:
-                            return [r]
-                    # Only empty diagnostics so far—wait for a bit longer for LSP server to catch up
-                    got_empty_diag = True
-                    time.sleep(0.1)
-                else:
+                            last_diagnostic_time = time.time()
+
+            # Handle diagnostic collection strategy
+            if method_filter == "textDocument/publishDiagnostics" and result:
+                # If we have diagnostics and enough time has passed since the last one,
+                # assume we've collected all available diagnostics
+                if (
+                    last_diagnostic_time
+                    and (time.time() - last_diagnostic_time) >= diagnostic_settle_time
+                ):
                     return result
-            # Wait for new pub/sub notifications
-            self.notifications_event.wait(timeout=timeout - (time.time() - start))
-            if got_empty_diag and (time.time() - start) > (timeout - 0.5):
-                break  # If we waited most of the timeout after empty, just return
+
+                # If we've been waiting too long (80% of timeout), return what we have
+                if (time.time() - start) > (timeout * 0.8):
+                    return result
+
+            elif result and method_filter != "textDocument/publishDiagnostics":
+                # For non-diagnostic notifications, return immediately
+                return result
+
+            # Wait for new notifications or timeout
+            remaining_time = timeout - (time.time() - start)
+            if remaining_time > 0:
+                self.notifications_event.wait(timeout=min(0.1, remaining_time))
+            else:
+                break
+
         return result
 
     def shutdown(self):
