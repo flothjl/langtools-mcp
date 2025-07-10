@@ -1,8 +1,3 @@
-import base64
-import json
-import os
-import webbrowser
-import zlib
 from typing import List, Tuple
 from urllib.parse import quote
 
