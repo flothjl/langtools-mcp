@@ -6,11 +6,12 @@ from mcp.shared.exceptions import McpError
 from mcp.types import INVALID_REQUEST, ErrorData
 from pydantic import BaseModel, Field, FilePath
 
-import langtools_mcp.langtools.ruff_analyzer  # registers the python analyzer
 from langtools_mcp.langtools.analysis import run_analysis_for_language
 
 INSTRUCTIONS = """
-Currently ONLY supports python
+currently supports the following languages:
+    - python
+    - golang
 """
 
 mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)

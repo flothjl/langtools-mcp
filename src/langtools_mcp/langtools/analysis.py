@@ -1,10 +1,11 @@
-from pathlib import Path
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 SUPPORTED_LANGUAGES = {
     ".py": "python",
     ".go": "go",
 }
+
 
 class BaseAnalyzer(ABC):
     @abstractmethod
@@ -14,10 +15,13 @@ class BaseAnalyzer(ABC):
         """
         pass
 
+
 ANALYZER_REGISTRY = {}
+
 
 def register_analyzer(language: str, analyzer_cls):
     ANALYZER_REGISTRY[language] = analyzer_cls()
+
 
 def validate_file_type(file_path: str) -> str:
     """
@@ -30,8 +34,11 @@ def validate_file_type(file_path: str) -> str:
         raise ValueError(f"File does not exist: {file_path!r}")
     ext = p.suffix.lower()
     if ext not in SUPPORTED_LANGUAGES:
-        raise ValueError(f"Unsupported file extension: {ext!r}. Only .py and .go files are supported.")
+        raise ValueError(
+            f"Unsupported file extension: {ext!r}. Only .py and .go files are supported."
+        )
     return SUPPORTED_LANGUAGES[ext]
+
 
 def run_analysis_for_language(file_path: str) -> dict:
     language = validate_file_type(file_path)
