@@ -1,16 +1,18 @@
 import json
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import sys
 import traceback
-from langtools_mcp.langtools_daemon.lsp_pool import LSPServerPool
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from langtools_mcp.langtools_daemon.gopls_lsp_adapter import GoplsLSPAdapter
 from langtools_mcp.langtools_daemon.lsp_adapter import find_go_module_root
+from langtools_mcp.langtools_daemon.lsp_pool import LSPServerPool
 
 HOST = "localhost"
 PORT = 61782
 
 # One pool for all requests
 lsp_pool = LSPServerPool({"go": GoplsLSPAdapter})
+
 
 class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -42,6 +44,7 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
                     ensure_ruff,
                     run_ruff_analysis,
                 )
+
                 ruff_path, err = ensure_ruff()
                 if err is not None:
                     print(f"[DAEMON] Ruff error: {err}", file=sys.stderr)
@@ -68,8 +71,15 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.safe_write(json.dumps(result).encode())
         except BrokenPipeError:
-            print(f"[DAEMON EXCEPTION] BrokenPipeError: Client disconnected before response could be delivered.", file=sys.stderr)
-            print("[DAEMON] Would have sent:", json.dumps(result) if result else "No result", file=sys.stderr)
+            print(
+                f"[DAEMON EXCEPTION] BrokenPipeError: Client disconnected before response could be delivered.",
+                file=sys.stderr,
+            )
+            print(
+                "[DAEMON] Would have sent:",
+                json.dumps(result) if result else "No result",
+                file=sys.stderr,
+            )
         except Exception as exc:
             print(f"[DAEMON EXCEPTION] {exc}", file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
@@ -80,13 +90,20 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
             try:
                 self.safe_write(json.dumps(error_json).encode())
             except BrokenPipeError:
-                print("[DAEMON EXCEPTION] BrokenPipeError when sending error JSON, client disconnected too soon.", file=sys.stderr)
+                print(
+                    "[DAEMON EXCEPTION] BrokenPipeError when sending error JSON, client disconnected too soon.",
+                    file=sys.stderr,
+                )
 
     def safe_write(self, data):
         try:
             self.wfile.write(data)
         except BrokenPipeError:
-            print(f"[DAEMON EXCEPTION] BrokenPipeError during write. Data was: {data!r}", file=sys.stderr)
+            print(
+                f"[DAEMON EXCEPTION] BrokenPipeError during write. Data was: {data!r}",
+                file=sys.stderr,
+            )
+
 
 def run():
     server_address = (HOST, PORT)
@@ -97,6 +114,7 @@ def run():
     except KeyboardInterrupt:
         print("Shutting down daemon...")
         httpd.server_close()
+
 
 if __name__ == "__main__":
     run()

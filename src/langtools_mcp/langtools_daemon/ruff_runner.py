@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 
 
 def ensure_ruff():
@@ -13,8 +14,6 @@ def ensure_ruff():
 
 
 def run_ruff_analysis(ruff_bin, file_path):
-    import subprocess
-
     try:
         cmd = [ruff_bin, "check", file_path, "--output-format=json"]
         proc = subprocess.run(

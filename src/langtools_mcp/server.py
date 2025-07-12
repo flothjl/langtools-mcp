@@ -11,7 +11,8 @@ from langtools_mcp.langtools.analysis import run_analysis_for_language
 INSTRUCTIONS = """
 currently supports the following languages:
     - python
-    - golang
+    - golang.
+When passing a `file_path` you MUST pass a full absolute path to the file. 
 """
 
 mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)
@@ -19,7 +20,7 @@ mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)
 
 class AnalyzeFileParams(BaseModel):
     file_path: FilePath = Field(
-        description="Must be a filepath. example: path/to/file.txt"
+        description="Must be an absolute path to the file /path/to/file.txt"
     )
 
 
