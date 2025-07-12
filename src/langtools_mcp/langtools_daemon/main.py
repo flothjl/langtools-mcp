@@ -1,7 +1,6 @@
 import json
 import logging
-import sys
-import traceback
+import os
 from abc import ABC, abstractmethod
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
@@ -122,7 +121,7 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
                 "Would have sent:",
                 json.dumps(result) if result else "No result",
             )
-        except UnsupportedLanguageException as exc:
+        except UnsupportedLanguageException:
             logger.warning(f"Language not supported: {language}")
             self.send_response(400)
             self.end_headers()
@@ -143,7 +142,9 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
 
 
 def run():
-    server_address = (HOST, PORT)
+    host: str = os.getenv("LANGTOOLSD_HOST", HOST)
+    port = int(os.getenv("LANGTOOLSD_PORT", PORT))
+    server_address = (host, port)
     httpd = HTTPServer(server_address, LangtoolsDaemonHandler)
     logger.info(f"LSP Daemon started on {HOST}:{PORT}")
     try:

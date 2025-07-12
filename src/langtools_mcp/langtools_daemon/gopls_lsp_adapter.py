@@ -8,6 +8,46 @@ from .lsp_adapter import BasicLSPClient
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_GOPLS_CONFIG = {
+    "gofumpt": True,
+    "codelenses": {
+        "gc_details": False,
+        "generate": True,
+        "regenerate_cgo": True,
+        "run_govulncheck": True,
+        "test": True,
+        "tidy": True,
+        "upgrade_dependency": True,
+        "vendor": True,
+    },
+    "hints": {
+        "assignVariableTypes": True,
+        "compositeLiteralFields": True,
+        "compositeLiteralTypes": True,
+        "constantValues": True,
+        "functionTypeParameters": True,
+        "parameterNames": True,
+        "rangeVariableTypes": True,
+    },
+    "analyses": {
+        "nilness": True,
+        "unusedparams": True,
+        "unusedwrite": True,
+        "useany": True,
+    },
+    "usePlaceholders": True,
+    "completeUnimported": True,
+    "staticcheck": True,
+    "directoryFilters": [
+        "-.git",
+        "-.vscode",
+        "-.idea",
+        "-.vscode-test",
+        "-node_modules",
+    ],
+    "semanticTokens": True,
+}
+
 
 class GoplsLSPAdapter:
     def __init__(self, root_path, gopls_path="gopls", config=None):
@@ -15,49 +55,7 @@ class GoplsLSPAdapter:
         self.gopls_path = gopls_path
         self.lsp = None  # Will start on first analyze
         self.started = False
-        self.config = config or self._get_default_config()
-
-    def _get_default_config(self):
-        """Get default gopls configuration similar to LazyVim"""
-        return {
-            "gofumpt": True,
-            "codelenses": {
-                "gc_details": False,
-                "generate": True,
-                "regenerate_cgo": True,
-                "run_govulncheck": True,
-                "test": True,
-                "tidy": True,
-                "upgrade_dependency": True,
-                "vendor": True,
-            },
-            "hints": {
-                "assignVariableTypes": True,
-                "compositeLiteralFields": True,
-                "compositeLiteralTypes": True,
-                "constantValues": True,
-                "functionTypeParameters": True,
-                "parameterNames": True,
-                "rangeVariableTypes": True,
-            },
-            "analyses": {
-                "nilness": True,
-                "unusedparams": True,
-                "unusedwrite": True,
-                "useany": True,
-            },
-            "usePlaceholders": True,
-            "completeUnimported": True,
-            "staticcheck": True,
-            "directoryFilters": [
-                "-.git",
-                "-.vscode",
-                "-.idea",
-                "-.vscode-test",
-                "-node_modules",
-            ],
-            "semanticTokens": True,
-        }
+        self.config = config or DEFAULT_GOPLS_CONFIG
 
     def start_server(self):
         if not self.started:
