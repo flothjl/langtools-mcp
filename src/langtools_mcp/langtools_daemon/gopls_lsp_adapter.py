@@ -1,9 +1,12 @@
+import logging
 import os
 import sys
 import time
 import traceback
 
 from .lsp_adapter import BasicLSPClient
+
+logger = logging.getLogger(__name__)
 
 
 class GoplsLSPAdapter:
@@ -58,9 +61,8 @@ class GoplsLSPAdapter:
 
     def start_server(self):
         if not self.started:
-            print(
-                f"[GoplsLSPAdapter] Starting gopls for root={self.root_path}",
-                file=sys.stderr,
+            logger.info(
+                f"Starting gopls for root={self.root_path}",
             )
             self.lsp = BasicLSPClient([self.gopls_path])
             self.lsp.start()
@@ -84,7 +86,7 @@ class GoplsLSPAdapter:
             }
 
             init_resp = self.lsp.send_request("initialize", init_params)
-            print(f"[GOPLS ADAPTER] initialize resp: {init_resp}", file=sys.stderr)
+            logger.info(f"initialize resp: {init_resp}")
 
             # Send initialized notification
             self.lsp.send_notification("initialized", {})
@@ -94,9 +96,8 @@ class GoplsLSPAdapter:
                 "workspace/didChangeConfiguration", {"settings": {"gopls": self.config}}
             )
 
-            print(
-                f"[GOPLS ADAPTER] Sent gopls configuration: {self.config}",
-                file=sys.stderr,
+            logger.info(
+                f"Sent gopls configuration: {self.config}",
             )
             time.sleep(0.5)
             self.started = True
@@ -106,7 +107,7 @@ class GoplsLSPAdapter:
             self.start_server()
             with open(file_path) as f:
                 file_content = f.read()
-            print(f"[GOPLS ADAPTER] Analyzing {file_path}", file=sys.stderr)
+            logger.info(f"Analyzing {file_path}")
             self.lsp.send_notification(
                 "textDocument/didOpen",
                 {
@@ -118,15 +119,14 @@ class GoplsLSPAdapter:
                     }
                 },
             )
-            print("[GOPLS ADAPTER] Sent didOpen notification", file=sys.stderr)
+            logger.info("Sent didOpen notification")
 
             # Collect ALL diagnostic messages (not just the first one)
             diags = self.lsp.gather_notifications(
                 "textDocument/publishDiagnostics", timeout=10.0
             )
-            print(
-                f"[GOPLS ADAPTER] Received {len(diags)} diagnostic messages",
-                file=sys.stderr,
+            logger.info(
+                f"Received {len(diags)} diagnostic messages",
             )
 
             # Count total diagnostics across all messages
@@ -141,9 +141,8 @@ class GoplsLSPAdapter:
                         source = diag.get("source", "unknown")
                         diagnostic_sources.add(source)
 
-            print(
-                f"[GOPLS ADAPTER] Total diagnostics: {total_diagnostics} from sources: {list(diagnostic_sources)}",
-                file=sys.stderr,
+            logger.info(
+                f"Total diagnostics: {total_diagnostics} from sources: {list(diagnostic_sources)}",
             )
 
             # Optionally send didClose to minimize memory in big servers
@@ -160,11 +159,10 @@ class GoplsLSPAdapter:
                     },
                 }
             else:
-                print("[GOPLS ADAPTER] No diagnostics received.", file=sys.stderr)
+                logger.info("No diagnostics received.")
                 return {"status": "ok", "note": "No diagnostics received from gopls."}
         except Exception as e:
-            print(f"[GOPLS ADAPTER EXCEPTION] {e}", file=sys.stderr)
-            traceback.print_exc(file=sys.stderr)
+            logger.exception("Exception occurred")
             return {"status": "fail", "error": f"Exception in analyzer: {e}"}
 
     def shutdown(self):

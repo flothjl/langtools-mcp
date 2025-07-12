@@ -7,6 +7,9 @@ from mcp.types import INVALID_REQUEST, ErrorData
 from pydantic import BaseModel, Field, FilePath
 
 from langtools_mcp.langtools.analysis import run_analysis_for_language
+from langtools_mcp.logger import setup_logging
+
+logger = setup_logging()
 
 INSTRUCTIONS = """
 currently supports the following languages:

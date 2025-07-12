@@ -1,5 +1,9 @@
-import threading
+import logging
 import sys
+import threading
+
+logger = logging.getLogger(__name__)
+
 
 class LSPServerPool:
     def __init__(self, adapter_classes):
@@ -15,7 +19,9 @@ class LSPServerPool:
         with self.lock:
             key = (language, root_path)
             if key not in self.servers:
-                print(f"[LSP_POOL] Spawning new {language} LSP for root={root_path}", file=sys.stderr)
+                logger.info(
+                    f"Spawning new {language} LSP for root={root_path}",
+                )
                 adapter_cls = self.adapter_classes[language]
                 self.servers[key] = adapter_cls(root_path=root_path, **kwargs)
             return self.servers[key]
