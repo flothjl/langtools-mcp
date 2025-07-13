@@ -1,5 +1,8 @@
 # langtools-mcp
 
+> [!WARNING]
+> 🚧 This has primarily been developed for use with the on-machine AI agents, [Goose](https://block.github.io/goose/docs/quickstart/). 🚧
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
 **langtools-mcp** is a Model Context Protocol (MCP) server and client toolkit that gives LLMs and AI agents unified access to real static analysis tools—including batch CLI checkers (like Ruff and go vet) and LSPs (like gopls, rust-analyzer, and more).
@@ -59,6 +62,27 @@ uv sync  # or pip install -e .[dev]
 ---
 
 ## Quickstart
+
+### Project [Goose](https://block.github.io/goose/docs/quickstart/)
+
+```yaml
+langtools:
+  args:
+    - --from
+    - https://github.com/flothjl/langtools-mcp
+    - langtools-mcp
+  bundled: null
+  cmd: uvx
+  description: null
+  enabled: true
+  env_keys: []
+  envs: {}
+  name: langtools-mcp
+  timeout: null
+  type: stdio
+```
+
+### Manual
 
 Analyze a Python or Go project:
 

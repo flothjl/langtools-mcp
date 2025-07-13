@@ -19,10 +19,3 @@ def parse_as_json_document(output: str) -> List[Dict]:
     if not output.strip():
         return []
     return json.loads(output)
-
-
-def parse_as_json_stream(output: str) -> List[Dict]:
-    """Parses a stream of JSON objects, one per line."""
-    if not output.strip():
-        return []
-    return [json.loads(line) for line in output.strip().split("\n") if line]
