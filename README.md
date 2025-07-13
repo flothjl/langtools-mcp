@@ -30,7 +30,9 @@ langtools:
   type: stdio
 ```
 
-<img src="./assets/goose_sample.png" style="display: block; margin-left: auto; margin-right: auto; width: 60%;">
+<p align="center">
+<img src="./assets/goose_sample.png" style="width: 60%;">
+</p>
 
 ### Manual
 
