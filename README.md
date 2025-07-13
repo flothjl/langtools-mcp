@@ -11,25 +11,23 @@
 
 ## Why langtools-mcp?
 
-Large Language Models often write code that _runs_ but doesn’t follow best practices, or contains subtle bugs. **langtools-mcp** lets your AI and agentic apps **catch, explain, and even fix** issues in code, by calling the same tools expert programmers use.
+We've all been there:
 
-- ✅ **Unified API:** One entrypoint for Python, Go, and more—CLI or LSP tools, same API.
+- LLM writes code that doesn't compile due to hallucinating standard libraries that don't exist, syntax errors, etc.
+- LLM writes functional code, but the style, formatting, and linting is non-existent (I'm looking at you, unused imports)
+
+**langtools-mcp** aims to help solve this by letting your AI and agentic apps **catch, explain, and even fix** issues in code, by calling the same tools expert programmers use. The goal is simply for this MCP to be a tool that the LLM begins using as part of its dev cycle. Just like IDEs and LSPs supercharged humans' ability to quickly assess and fix issues during the dev process, langtools aims to do this with an MCP tool.
+
 - 🧠 **Supercharge Agents:** Let your LLMs/AI validate, lint, and debug their own code.
-- 🧩 **Modular & Extensible:** Add new languages/tools in minutes via Python strategies.
+- 🧩 **Modular & Extensible:** Add new languages/tools in minutes via strategies.
 - ⚡ **Daemon or Batch:** Runs as a fast HTTP daemon for LSP and batch CLI tools.
-- 🏗️ **Perfect for:**
-
-  - Automated code review bots
-  - Multi-language repositories
-  - LLM self-correction workflows
-  - Continuous Integration (CI) pipelines
 
 ---
 
 ## Architecture
 
-`langtools-mcp` launches a **central daemon** (`langtools_daemon`) that manages language tools for each supported language.
-Your app or agent communicates with the daemon via a simple HTTP interface (local), using the provided Python client.
+`langtools-mcp` leverages the mcp python sdk, and launches a **central daemon** (`langtools_daemon`) that manages language tools for each supported language.
+Your app or agent communicates with the mcp server, and then langtools communicates with the daemon via a simple HTTP interface (local), using the provided Python client. This gives us the flexibility to add support for practically any tool
 
 ```
 +----------------------------+          HTTP API        +--------------------------+
@@ -139,22 +137,11 @@ POST /
 
 - [x] **Python**: Ruff, Pyright (CLI)
 - [x] **Go**: go vet (CLI)
-- [ ] **Go**: gopls (LSP; hybrid mode coming)
 - [ ] **Rust**: rust-analyzer (LSP)
 - [ ] **JavaScript/TypeScript**: tsc, eslint (planned)
 
 Want to add support for your favorite tool or language?
 Open a [PR](https://github.com/flothjl/langtools-mcp/pulls) or start a [Discussion](https://github.com/flothjl/langtools-mcp/discussions)!
-
----
-
-## FAQ
-
-**Q: Do I need to run a daemon for CLI-only tools?**
-_A: The daemon makes it easier to integrate with LLMs and lets you mix in LSPs or future batch tools seamlessly. For simple batch runs, you can call the CLI client directly._
-
-**Q: What if a language only supports LSP, not CLI?**
-_A: langtools-mcp’s architecture supports both. Each strategy decides whether to use a CLI or LSP process under the hood._
 
 ---
 
