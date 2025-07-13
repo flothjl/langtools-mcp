@@ -2,19 +2,30 @@ import os
 from pathlib import Path
 
 
-def find_virtual_env(path: str) -> str | None:
+def find_virtual_env(path: str, max_depth=4) -> str | None:
     """
-    Finds a virtual environment directory within the project root.
-    Searches for common names like '.venv', 'venv', 'env'.
+    Recursively search downward from `path` (up to max_depth levels)
+    for a virtual environment directory.
+    Looks for typical names and activation files.
     """
-    common_names = [".venv", "venv", "env", ".env"]
-    for name in common_names:
-        venv_path = Path(path) / name
-        # Check for the activation script or python executable to confirm it's a venv
-        if (venv_path / "bin" / "activate").exists() or (
-            venv_path / "Scripts" / "activate.bat"
-        ).exists():
-            return str(venv_path)
+    root = Path(path)
+    candidate_names = {".venv", "venv", "env", ".env"}
+    # Breadth-first search up to max_depth
+    queue = [(root, 0)]
+    while queue:
+        curr, depth = queue.pop(0)
+        if depth > max_depth:
+            continue
+        for child in curr.iterdir():
+            if child.is_dir() and child.name in candidate_names:
+                # Check for venv activation script (Unix or Windows)
+                if (child / "bin" / "activate").exists() or (
+                    child / "Scripts" / "activate.bat"
+                ).exists():
+                    return str(child)
+            # Enqueue subdirectories to search further down
+            if child.is_dir() and not child.name.startswith("."):
+                queue.append((child, depth + 1))
     return None
 
 
