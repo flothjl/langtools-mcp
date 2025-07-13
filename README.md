@@ -9,6 +9,48 @@
 
 ---
 
+## Quickstart
+
+### Configuring for Project [Goose](https://block.github.io/goose/docs/quickstart/)
+
+```yaml
+langtools:
+  args:
+    - --from
+    - https://github.com/flothjl/langtools-mcp
+    - langtools-mcp
+  bundled: null
+  cmd: uvx
+  description: null
+  enabled: true
+  env_keys: []
+  envs: {}
+  name: langtools-mcp
+  timeout: null
+  type: stdio
+```
+
+![Goose Sample](./assets/goose_sample.png)
+
+### Manual
+
+Analyze a Python or Go project:
+
+```bash
+python -m langtools_mcp path/to/your_file.py
+```
+
+Or, use the daemon in your own code:
+
+```python
+from langtools_mcp.langtools.analysis import run_analysis_for_language
+
+result = run_analysis_for_language("python", "/path/to/my/project")
+print(result)
+```
+
+---
+
 ## Why langtools-mcp?
 
 We've all been there:
@@ -56,46 +98,6 @@ uv sync  # or pip install -e .[dev]
 ```
 
 **Requirements:** Python 3.10+, plus [ruff](https://docs.astral.sh/ruff/), [pyright](https://github.com/microsoft/pyright), and [Go](https://go.dev/doc/install) for Go support (must be in your PATH).
-
----
-
-## Quickstart
-
-### Project [Goose](https://block.github.io/goose/docs/quickstart/)
-
-```yaml
-langtools:
-  args:
-    - --from
-    - https://github.com/flothjl/langtools-mcp
-    - langtools-mcp
-  bundled: null
-  cmd: uvx
-  description: null
-  enabled: true
-  env_keys: []
-  envs: {}
-  name: langtools-mcp
-  timeout: null
-  type: stdio
-```
-
-### Manual
-
-Analyze a Python or Go project:
-
-```bash
-python -m langtools_mcp path/to/your_file.py
-```
-
-Or, use the daemon in your own code:
-
-```python
-from langtools_mcp.langtools.analysis import run_analysis_for_language
-
-result = run_analysis_for_language("python", "/path/to/my/project")
-print(result)
-```
 
 ---
 
@@ -149,8 +151,3 @@ Open a [PR](https://github.com/flothjl/langtools-mcp/pulls) or start a [Discussi
 
 - Fork, clone, and submit a PR!
 - Code and docs welcome for new languages, better error messages, and more.
-
----
-
-**Questions?**
-Open an [issue](https://github.com/flothjl/langtools-mcp/issues), or join our community chat!
