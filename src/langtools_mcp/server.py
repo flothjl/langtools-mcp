@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Literal, Tuple
 from urllib.parse import quote
 
 from mcp.server.fastmcp import FastMCP
@@ -22,18 +22,19 @@ mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)
 
 
 class AnalyzeFileParams(BaseModel):
-    file_path: FilePath = Field(
-        description="Must be an absolute path to the file /path/to/file.txt"
-    )
+    language: Literal["python", "golang"]
+    project_root: str
 
 
 @mcp.tool(
-    "AnalyzeFile",
-    description="Run a file through analysis. You MUST provide a valid Path for the file.",
+    "Analyze",
+    description="Run a project through analysis for a given language. ",
 )
-def analyze_file(params: AnalyzeFileParams):
+def analyze(params: AnalyzeFileParams):
     try:
-        analysis_result = run_analysis_for_language(str(params.file_path))
+        analysis_result = run_analysis_for_language(
+            language=params.language, project_root=params.project_root
+        )
     except ValueError as e:
         raise McpError(ErrorData(message=str(e), code=INVALID_REQUEST))
     except NotImplementedError as e:

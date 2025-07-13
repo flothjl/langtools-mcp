@@ -6,20 +6,6 @@ import time
 import uuid
 
 
-def find_go_module_root(file_path):
-    dir_path = os.path.abspath(os.path.dirname(file_path))
-    while True:
-        maybe_mod = os.path.join(dir_path, "go.mod")
-        if os.path.isfile(maybe_mod):
-            return dir_path
-        parent = os.path.dirname(dir_path)
-        if parent == dir_path:
-            break
-        dir_path = parent
-    # Fallback: file's parent
-    return os.path.abspath(os.path.dirname(file_path))
-
-
 class BasicLSPClient:
     def __init__(self, server_cmd):
         self.server_cmd = server_cmd
