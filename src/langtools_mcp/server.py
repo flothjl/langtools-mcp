@@ -1,10 +1,9 @@
-from typing import List, Literal, Tuple
-from urllib.parse import quote
+from typing import Literal
 
 from mcp.server.fastmcp import FastMCP
 from mcp.shared.exceptions import McpError
 from mcp.types import INVALID_REQUEST, ErrorData
-from pydantic import BaseModel, Field, FilePath
+from pydantic import BaseModel
 
 from langtools_mcp.langtools.analysis import run_analysis_for_language
 from langtools_mcp.logger import setup_logging
@@ -22,7 +21,7 @@ mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)
 
 
 class AnalyzeFileParams(BaseModel):
-    language: Literal["python", "golang"]
+    language: Literal["python", "go"]
     project_root: str
 
 
