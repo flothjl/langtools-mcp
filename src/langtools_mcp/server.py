@@ -1,3 +1,4 @@
+import logging
 from typing import Literal
 
 from mcp.server.fastmcp import FastMCP
@@ -8,7 +9,8 @@ from pydantic import BaseModel
 from langtools_mcp.langtools.analysis import run_analysis_for_language
 from langtools_mcp.logger import setup_logging
 
-logger = setup_logging()
+setup_logging()
+logger = logging.getLogger(__name__)
 
 INSTRUCTIONS = """
 currently supports the following languages:
