@@ -15,23 +15,25 @@ logger = logging.getLogger(__name__)
 INSTRUCTIONS = """
 currently supports the following languages:
     - python
-    - golang.
-When passing a `file_path` you MUST pass a full absolute path to the file. 
+    - golang
+    - typescript/javascript
+When passing a `project_root` you MUST pass a full absolute path to the root of the project you are analyzing.
+For monorepos, be sure to pass the project within the repo you want analysis on. 
 """
 
 mcp = FastMCP("MCP to allow llms to analyze their code", INSTRUCTIONS)
 
 
 class AnalyzeFileParams(BaseModel):
-    language: Literal["python", "go"]
+    language: Literal["python", "go", "typescript", "javascript"]
     project_root: str
 
 
 @mcp.tool(
-    "Analyze",
-    description="Run a project through analysis for a given language. ",
+    "AnalyzeCodebase",
+    description="Run a codebase through analysis for a given language. ",
 )
-def analyze(params: AnalyzeFileParams):
+def analyze_codebase(params: AnalyzeFileParams):
     try:
         analysis_result = run_analysis_for_language(
             language=params.language, project_root=params.project_root

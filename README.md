@@ -3,7 +3,7 @@
 > [!WARNING]
 > 🚧 This is actively being developed, so expect issues. Currently focusing on compatibility with the on-machine AI agent [Goose](https://block.github.io/goose/docs/quickstart/). 🚧
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **langtools-mcp** is a Model Context Protocol (MCP) server and client toolkit that gives LLMs and AI agents unified access to real static analysis tools—including batch CLI checkers (like Ruff and go vet) and LSPs (like gopls, rust-analyzer, and more).
 
@@ -65,6 +65,22 @@ We've all been there:
 - 🧠 **Supercharge Agents:** Let your LLMs/AI validate, lint, and debug their own code.
 - 🧩 **Modular & Extensible:** Add new languages/tools in minutes via strategies.
 - ⚡ **Daemon or Batch:** Runs as a fast HTTP daemon for LSP and batch CLI tools.
+
+---
+
+## Configuring
+
+Easily configure what tools are run for each language.
+
+```bash
+export LANGTOOLS_PYTHON_TOOLS='["ruff"]'
+export LANGTOOLS_GO_GO_TOOLS='["vet"]'
+```
+
+### Tools by language
+
+Python - "ruff", "pyright"
+Go - "vet"
 
 ---
 

@@ -35,15 +35,15 @@ class LangtoolsDaemonHandler(BaseHTTPRequestHandler):
                 return
             try:
                 strategy_cls = LANGUAGE_STRATEGIES[language.lower()]
-                strategy = strategy_cls()
+                strategy = strategy_cls(project_root)
             except KeyError:
                 self.send_error_json(400, f"Unsupported language: {language}")
                 return
-            result = strategy.analyze(project_root)
+            result = strategy.analyze()
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            self.wfile.write(json.dumps(result).encode())
+            self.wfile.write(result.model_dump_json().encode())
         except Exception as exc:
             logger.exception("Unhandled exception")
             self.send_error_json(500, str(exc))
