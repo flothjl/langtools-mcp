@@ -42,7 +42,7 @@ langtools:
 ```
 
 <p align="center">
-<img src="./assets/goose_sample.png" style="width: 60%;">
+<img src="./assets/goose_sample.png" style="width: 75%;">
 </p>
 
 #### Configuration Options
