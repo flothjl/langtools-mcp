@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/flothjl-langtools-mcp-badge.png)](https://mseep.ai/app/flothjl-langtools-mcp)
+
 # langtools-mcp
 
 > [!WARNING]
